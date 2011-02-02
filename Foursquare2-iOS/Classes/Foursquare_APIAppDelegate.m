@@ -19,6 +19,18 @@
 #pragma mark -
 #pragma mark Application lifecycle
 
+
+- (void)foursquareDidLogin:(id)result
+{
+	NSLog(@"foursquareDidLogin");
+	[Foursquare2  getDetailForUser:@"self"
+						  callback:^(BOOL success, id result){
+							  if (success) {
+								  NSLog(@"%@",result);
+							  }
+						  }];
+}
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 	window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]]; 
     viewController = [[UIViewController alloc]init];
@@ -28,26 +40,16 @@
 	[viewController viewWillAppear:YES];
     [window makeKeyAndVisible];
 
-	//[Foursquare2 removeAccessToken];
+	[Foursquare2 removeAccessToken];
 	if ([Foursquare2 isNeedToAuthorize]) {
 		[self authorizeWithViewController:viewController Callback:^(BOOL success,id result){
 			if (success) {
-				[Foursquare2  getDetailForUser:@"self"
-									  callback:^(BOOL success, id result){
-										  if (success) {
-											  NSLog(@"%@",result);
-										  }
-									  }];
+				[self foursquareDidLogin:result];
 			}
 		}];
-	}else {
-		
-		[Foursquare2  getDetailForUser:@"self"
-							  callback:^(BOOL success, id result){
-								  if (success) {
-									  NSLog(@"%@",result);
-								  }
-							  }];
+	}
+	else
+		[self foursquareDidLogin:result];
 
 //		Example check-in 
 //		[Foursquare2  createCheckinAtVenue:@"6522771"
@@ -64,7 +66,7 @@
 //									NSLog(@"%@",result);
 //								}
 //							}];
-	}
+
 	return YES;
 }
 
